@@ -1454,7 +1454,9 @@ if ($file_names != null && $file_names != "" && $file_size != null && $file_size
     if (isset($requestData['search']['value']) && $requestData['search']['value'] != '') {
             $sql .= " AND ( Advertisement_No LIKE '%" . esc_sql($requestData['search']['value']) . "%') ";
         }
-$sql .= " ORDER BY Curentjobid DESC, CloseingDate DESC";
+		
+		 $sql .= " ORDER BY Curentjobid ASC";
+$sql .= "ORDER BY CloseingDate DESC";
         $result=$wpdb->get_results($wpdb->prepare($sql, Array()), OBJECT);
 
         
