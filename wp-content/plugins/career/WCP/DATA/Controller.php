@@ -1436,36 +1436,27 @@ if ($file_names != null && $file_names != "" && $file_size != null && $file_size
     }
 
    
-    public static function career_current_recruitments(){
-
-       
-        $requestData = $_REQUEST;
-    
-        global $wpdb,$wp;
-        $data = array();
- 
-        $sql = "SELECT * FROM tbl_careers_curentjob ";
-
-     
-
-        $date=date("Y-m-d h:m:i");
-          $sql .= " where OpeningDate <= '".$date."' AND CloseingDate >= '".$date."'";
+public static function career_current_recruitments() {
+    $requestData = $_REQUEST;
+    global $wpdb, $wp;
+    $data = array();
+    $sql = "SELECT * FROM tbl_careers_curentjob ";
+    $date = date("Y-m-d h:m:i");
+    $sql .= "WHERE OpeningDate <= '" . $date . "' AND CloseingDate >= '" . $date . "'";
     
     if (isset($requestData['search']['value']) && $requestData['search']['value'] != '') {
-            $sql .= " AND ( Advertisement_No LIKE '%" . esc_sql($requestData['search']['value']) . "%') ";
-        }
-		
-		 $sql .= " ORDER BY Curentjobid ASC";
-$sql .= "ORDER BY CloseingDate DESC";
-        $result=$wpdb->get_results($wpdb->prepare($sql, Array()), OBJECT);
-
-        
-        $totalData = 0;
-        $totalFiltered = 0;
-         if (count($result) > 0) {
-            $totalData = count($result);
-            $totalFiltered = count($result);
-        }
+        $sql .= " AND ( Advertisement_No LIKE '%" . esc_sql($requestData['search']['value']) . "%') ";
+    }
+        $sql .= " ORDER BY Curentjobid DESC";
+    
+    $result = $wpdb->get_results($wpdb->prepare($sql, array()), OBJECT);
+    $totalData = 0;
+    $totalFiltered = 0;
+    
+    if (count($result) > 0) {
+        $totalData = count($result);
+        $totalFiltered = count($result);
+    }
       $k=1;
         //This is for pagination
         if (isset($requestData['start']) && $requestData['start'] != '' && isset($requestData['length']) && $requestData['length'] != '') {
@@ -1562,27 +1553,43 @@ $sql .= "ORDER BY CloseingDate DESC";
 	
 	
 
-    public static function career_in_progress_recruitments(){
+   public static function career_in_progress_recruitments() {
+    $requestData = $_REQUEST;
+    global $wpdb, $wp;
+    $data = array();
 
-       
-        $requestData = $_REQUEST;
-    
-        global $wpdb,$wp;
-        $data = array();
- 
-        $sql = "SELECT * FROM tbl_careers_curentjob ";
+    $sql = "SELECT * FROM tbl_careers_curentjob ";
 
-     
+    $date = date("Y-m-d h:m:i");
+    $sql .= " WHERE tbl_careers_curentjob.Advertisement_No NOT IN (SELECT Advertisement_No FROM tbl_career_shortlistedjob WHERE Type LIKE '%close%') AND CloseingDate <= '" . $date . "'";
 
-        $date=date("Y-m-d h:m:i");
-          $sql .= " where tbl_careers_curentjob.Advertisement_No NOT IN(SELECT Advertisement_No FROM tbl_career_shortlistedjob Where Type LIKE '%close%') AND  CloseingDate <= '".$date."'";
-    
     if (isset($requestData['search']['value']) && $requestData['search']['value'] != '') {
-            $sql .= " AND ( Advertisement_No LIKE '%" . esc_sql($requestData['search']['value']) . "%') ";
-        }
+        $sql .= " AND (Advertisement_No LIKE '%" . esc_sql($requestData['search']['value']) . "%') ";
+    }
 
-        $result=$wpdb->get_results($wpdb->prepare($sql, Array()), OBJECT);
+    // Order by Curentjobid in descending order.
+    $sql .= " ORDER BY Curentjobid DESC";
 
+    $result = $wpdb->get_results($wpdb->prepare($sql, array()), OBJECT);
+
+    $totalData = 0;
+    $totalFiltered = 0;
+
+    if (count($result) > 0) {
+        $totalData = count($result);
+        $totalFiltered = count($result);
+    }
+
+    // Pagination logic.
+    $k = 1;
+
+    if (isset($requestData['start']) && $requestData['start'] != '' && isset($requestData['length']) && $requestData['length'] != '') {
+        $sql .= " LIMIT " . $requestData['start'] . "," . $requestData['length'];
+        $k = $requestData['start'] + 1;
+    }
+
+    // Retrieve the data with the updated SQL query.
+    $result = $wpdb->get_results($wpdb->prepare($sql, array()), OBJECT);
         
         $totalData = 0;
         $totalFiltered = 0;
